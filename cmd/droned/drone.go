@@ -116,6 +116,7 @@ func setupHandlers() {
 	queue := queue.Start(workers, queueRunner)
 
 	hookHandler := handler.NewHookHandler(queue)
+	artifactsHandler := handler.NewArtifactsHandler(queue)
 
 	m := pat.New()
 	m.Get("/login", handler.ErrorHandler(handler.Login))
@@ -193,6 +194,7 @@ func setupHandlers() {
 	m.Post("/install", handler.ErrorHandler(handler.InstallPost))
 
 	// handlers for repository, commits and build details
+	m.Get("/:host/:owner/:name/artifact/:commit.tar.gz", handler.ErrorHandler(artifactsHandler.GetArtifact))
 	m.Get("/:host/:owner/:name/commit/:commit/build/:label/out.txt", handler.RepoHandler(handler.BuildOut))
 	m.Get("/:host/:owner/:name/commit/:commit/build/:label", handler.RepoHandler(handler.CommitShow))
 	m.Get("/:host/:owner/:name/commit/:commit", handler.RepoHandler(handler.CommitShow))

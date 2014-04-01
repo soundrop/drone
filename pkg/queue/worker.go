@@ -44,6 +44,8 @@ func (w *worker) execute(task *BuildTask) error {
 	// from any sort panic that could occur
 	// to avoid brining down the entire application
 	defer func() {
+		close(task.finished)
+
 		if e := recover(); e != nil {
 			task.Build.Finished = time.Now().UTC()
 			task.Commit.Finished = time.Now().UTC()
@@ -164,6 +166,8 @@ func (w *worker) execute(task *BuildTask) error {
 	if task.Script.Notifications != nil {
 		task.Script.Notifications.Send(context)
 	}
+
+	task.finished <- task.Build.ID
 
 	return nil
 }
